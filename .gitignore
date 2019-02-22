@@ -3,3 +3,5 @@
 /tmp
 /samples
 credentials.json
+
+*.DS_Store

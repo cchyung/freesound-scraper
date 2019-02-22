@@ -62,15 +62,6 @@ def oauth2_authorize():
 
 oauth2_code = oauth2_authorize()
 
-# store results in numpy array
-# strips file name and adds extension if not present
-def process_file_name(file_name, file_type):
-    file_name_without_extension = os.path.splitext(file_name)[0]
-    file_name_without_extension = file_name_without_extension.replace('/', ' ')
-
-    # append file type at end of stripped file name
-    return file_name_without_extension.strip() + file_type
-
 # TODO: Add more of these as they pop up
 TAGS_TO_IGNORE = {
     'a',
@@ -109,7 +100,7 @@ def convert_to_numpy_array(results, query):
     data_array = np.empty(([0, MAX_TAGS + 2]))
 
     for idx, sound_file in enumerate(results):
-        file_name = query + str(idx).zfill(5)    # generate file name based off query
+        file_name = query + str(idx).zfill(5) + '.wav'   # generate file name based off query
         file_info = np.array([sound_file['id'], file_name], dtype='S128')
         processed_tags = process_tags(sound_file['tags'])
         tags = np.array(processed_tags[:MAX_TAGS])
@@ -239,7 +230,5 @@ test_query = {
 }
 
 data = multi_query(test_query)
-
+download_samples(data)
 #save_to_csv(data)
-
-# download_samples(numpy_results)
