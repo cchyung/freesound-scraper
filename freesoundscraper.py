@@ -221,15 +221,22 @@ def tag_statistics(data):
 
 
 # testing out
-num = 21
+num = 75
 test_query = {
     'kick': num,
-    # 'snare': num,
-    # 'clap': num,
-    # 'hat': num,
-    # 'perc': num,
-    # 'sfx': num,
-    # ''
+    'snare': num,
+    'clap': num,
+    'hat': num,
+    'perc': num,
+    'sfx': num,
+    'riser': num,
+    'wood block': num,
+    'snap': num,
+    'glass': num,
+    'bell': num,
+    'vocal chop': num,
+    'voice': num,
+    'one shot': num
 }
 
 data = multi_query(test_query)
