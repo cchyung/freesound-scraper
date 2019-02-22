@@ -223,12 +223,14 @@ def tag_statistics(data):
 num = 21
 test_query = {
     'kick': num,
-    'snare': num,
-    'clap': num,
-    'hat': num,
-    'perc': num,
+    # 'snare': num,
+    # 'clap': num,
+    # 'hat': num,
+    # 'perc': num,
+    # 'sfx': num,
+    # ''
 }
 
 data = multi_query(test_query)
+save_to_csv(data)
 download_samples(data)
-#save_to_csv(data)
