@@ -45,6 +45,7 @@ def oauth2_authorize():
     )
     # open new browser
     webbrowser.open_new(authorization_url)
+    print('please visit the following URL to achieve authorization code %s' % (authorization_url, ))
 
     # request code from browser
     authorization_response=input("type in authorization code: ")
