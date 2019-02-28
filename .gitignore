@@ -4,4 +4,6 @@
 /samples
 credentials.json
 
+/.vscode
+
 *.DS_Store

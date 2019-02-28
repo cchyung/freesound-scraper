@@ -11,7 +11,7 @@ import matplotlib as plt
 from requests_oauthlib import OAuth2Session
 
 # sample constants
-SAMPLES_PER_PAGE = 15
+SAMPLES_PER_PAGE = 100
 MAX_TAGS = 10
 MAX_DURATION = 6 # in seconds
 
@@ -25,8 +25,6 @@ AUTHORIZE = "/oauth2/authorize"
 # where to download samples too
 TARGET_DIR = 'tmp/'
 
-def download_url(sample_id):
-    return BASE_URL + SOUNDS + '/' + sample_id + DOWNLOAD
 
 # load credentials JSON file
 with open('credentials.json') as f:
@@ -61,8 +59,6 @@ def oauth2_authorize():
     access_token = r.json()['access_token']
     return access_token
 
-oauth2_code = oauth2_authorize()
-
 # TODO: Add more of these as they pop up
 TAGS_TO_IGNORE = {
     'a',
@@ -83,7 +79,7 @@ TAGS_TO_IGNORE = {
 
 # convert tags to lower case and removes dumb tags like "a"
 # returns False if all tags were pruned
-def process_tags(tags):
+def pre_process_tags(tags):
     processed_tags = []
 
     for tag in tags:
@@ -103,7 +99,7 @@ def convert_to_numpy_array(results, query):
     for idx, sound_file in enumerate(results):
         file_name = query + str(idx).zfill(5) + '.wav'   # generate file name based off query
         file_info = np.array([sound_file['id'], file_name], dtype='S128')
-        processed_tags = process_tags(sound_file['tags'])
+        processed_tags = pre_process_tags(sound_file['tags'])
         tags = np.array(processed_tags[:MAX_TAGS])
 
         # if there is at least one tag after processing, otherwise ignore
@@ -129,7 +125,8 @@ def query(query='', num_samples=1):
     # also want to avoid remixed sounds probably
     search_params = {
         'query':query,
-        'filter': filter_string('wav', MAX_DURATION, 1000, 4)
+        'filter': filter_string('wav', MAX_DURATION, 1000, 4),
+        'page_size': SAMPLES_PER_PAGE
     }
 
     def page_params(page_num):
@@ -159,7 +156,7 @@ def query(query='', num_samples=1):
             results.extend(response['results'][:num_samples - len(results)]) # only grab samples needed
         else:
             print("error getting more samples for this query...")
-            break;
+            break
 
     print("%i samples found for query: '%s'" % (len(results), query))
 
@@ -180,6 +177,7 @@ def multi_query(query_dict):
     print('%i samples found total' % (data_array.shape[0], ))
     return data_array
 
+oauth2_code = ''
 download_headers = {'Authorization': 'Bearer ' + oauth2_code}
 
 def download_and_save_sample(sample_id, file_name):
@@ -190,6 +188,9 @@ def download_and_save_sample(sample_id, file_name):
 
 # takes numpy array and downloads samples to TARGET_DIR
 def download_samples(data_to_download):
+    if oauth2_code is '':
+        oauth2_authorize()
+
     samples_downloaded = 0
     print("downloading %d samples to %s" % (data_to_download.shape[0], TARGET_DIR))
     for idx, sample in enumerate(data_to_download):
@@ -239,6 +240,13 @@ test_query = {
     'one shot': num
 }
 
-data = multi_query(test_query)
-save_to_csv(data)
-download_samples(data)
+# data = multi_query(test_query)
+# save_to_csv(data)
+# download_samples(data)
+
+
+temp_query = {
+    'kick' : 50
+}
+
+data = multi_query(temp_query)
