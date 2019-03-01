@@ -3,7 +3,9 @@
 /tmp
 /samples
 credentials.json
-
+__pycache__/
 /.vscode
 
 *.DS_Store
+
+pack_query

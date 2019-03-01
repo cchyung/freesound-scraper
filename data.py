@@ -1,6 +1,7 @@
 # # code that deals with translating json into rows for the numpy array
 import numpy as np
 import datetime
+import csv
 
 # TODO: place this in its own constant file
 MAX_TAGS = 10
@@ -45,6 +46,14 @@ class SampleData:
     def size(self):
         return self.data_array.shape[0]
     
+    # loads csv data into a numpy array
+    def load_from_csv(self, file_name):
+        self.data_array = np.loadtxt(open(file_name, "rt"), delimiter=",")
+
+    # combines from another SampleData object ignoring duplicates
+    def combine(self, data):
+        self.data_array = np.unique(np.concatenate((self.data_array, data.data_array), 0))
+
     # returns number of samples added
     def process_samples(self, results, query, samples_to_extract):
         for idx, sound_file in enumerate(results):

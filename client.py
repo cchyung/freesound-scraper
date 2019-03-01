@@ -9,6 +9,7 @@ import requests
 BASE_URL = "https://freesound.org/apiv2"
 SOUNDS = "/sounds"
 SEARCH = "/search/text"
+PACKS = "/packs"
 DOWNLOAD = "/download"
 AUTHORIZE = "/oauth2/authorize"
 ACCESS_TOKEN = "/oauth2/access_token"
@@ -79,8 +80,22 @@ class ApiClient:
             return {}
 
         # parse response
-        response = r.json()
-        return response
+        return r.json()
+
+    def query_pack(self, pack_id):
+        params = {
+            'token': self.secret_key,
+            'page_size': SAMPLES_PER_PAGE
+        }
+        url = BASE_URL + PACKS + '/' + pack_id + SOUNDS
+        print(url)
+        r = requests.get(url, params=params)
+        if r.status_code != 200:
+            print("error retrieving pack %s" % (pack_id, ))
+            return {}
+        
+        return r.json()
+
 
     def download_sample(self, sample_id, file_name, target_directory):
         download_headers = {'Authorization': 'Bearer ' + self.oauth2_code}
