@@ -37,7 +37,7 @@ class SampleData:
             tag = tag.lower()
             tag = tag.replace('-', ' ')   # replace dashes with spaces
             if not tag in TAGS_TO_IGNORE:
-                if not tag.isdigit() and not (tag == '808' or tag == '909'):
+                if not tag.isdigit() and not (tag == '808' or tag == '909' or tag == '707'):
                     processed_tags.append(tag)
 
         return processed_tags

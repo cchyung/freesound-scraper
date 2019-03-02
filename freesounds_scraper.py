@@ -96,10 +96,11 @@ def main(args):
     if(args.download_csv):
         download_csv(args.download_csv)
     else:
+        data = SampleData()
         if(args.pack_query):
-            data = retrieve_packs(args.pack_query[0])
+            data = retrieve_packs(args.pack_query)
         else:
-            data = retrieve_samples(args.query[0])
+            data = retrieve_samples(args.query)
         
         if(args.append_to_csv):
             if not os.path.isfile(args.append_to_csv[0]):
@@ -108,7 +109,7 @@ def main(args):
             loaded_data.load_from_csv(args.append_to_csv[0])
             data.combine(loaded_data)
 
-        data.save_to_csv(args.data)
+        data.save_to_csv(args.data_file_name)
 
         if(args.download):
             download_location = args.target
@@ -127,9 +128,9 @@ if __name__== "__main__":
     parser.add_argument('--query', nargs=1, type=str, default='query.csv', help='location of csv containing queries')
     parser.add_argument('--download', nargs=1, type=bool, default=False, help='whether or not to download')
     parser.add_argument('--target', nargs=1, type=str, default='samples/', help='path to download samples to')
-    parser.add_argument('--data', nargs=1, type=str, default='data.csv', help='file name for CSV')
+    parser.add_argument('--data-file-name', nargs=1, type=str, default='data.csv', help='file name for CSV')
     parser.add_argument('--download-csv', nargs=1, help='download a pre-processed csv')
-    parser.add_argument('--pack-query', nargs=1, type=str, default='pack_query', help='retrieve packs listed in input file')
+    parser.add_argument('--pack-query', nargs=1, type=str, help='retrieve packs listed in input file')
     parser.add_argument('--append-to-csv', nargs=1, type=str, help='append to already existing csv')
     args = parser.parse_args()
 
