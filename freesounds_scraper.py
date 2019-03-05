@@ -150,9 +150,10 @@ def main(args):
 def download_csv(csv_to_download, download_location, data_file_name):
     data = SampleData()
     data.load_from_csv(csv_to_download)
-    print(data.data_array)
-    # download(data, download_location)
-    # data.save_to_csv(data_file_name + '_downloaded')
+    if not os.path.isdir(download_location):
+        print("folder %s not found, creating" % (download_location, ))
+        os.mkdir(download_location)
+    download(data, download_location)
     
 if __name__== "__main__":
     # setup argument parser
