@@ -55,7 +55,7 @@ def retrieve_packs(pack_query_file_name):
 
     for pack_id in pack_ids:
         response = client.query_pack(pack_id)
-        if response is not json({}):
+        if response is not {}:
             data.process_samples(response['results'], pack_id, response['count'])
 
     return data
@@ -154,6 +154,7 @@ def download_csv(csv_to_download, download_location):
         print("folder %s not found, creating" % (download_location, ))
         os.mkdir(download_location)
     download(data, download_location)
+    data.save_to_csv(csv_to_download + '-downloaded')
     
 if __name__== "__main__":
     # setup argument parser
