@@ -61,7 +61,7 @@ class ApiClient:
         return True
     
     def filter_string(self, file_type='wav', max_duration=MAX_DURATION, min_downloads=500, min_avg_rating=4):
-        return f'type:{file_type} duration:[* TO {max_duration}]num_downloads:[{min_downloads} TO *]avg_rating:[{min_avg_rating} TO *]is_remix:false'
+        return f'type:{file_type} duration:[* TO {max_duration}]num_downloads:[{min_downloads} TO *]is_remix:false'
 
     # returns json from API for processing
     def query(self, query='', page=1):
