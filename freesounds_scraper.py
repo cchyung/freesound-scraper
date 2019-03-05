@@ -55,7 +55,7 @@ def retrieve_packs(pack_query_file_name):
 
     for pack_id in pack_ids:
         response = client.query_pack(pack_id)
-        if response is not {}:
+        if response is not json({}):
             data.process_samples(response['results'], pack_id, response['count'])
 
     return data
@@ -143,7 +143,7 @@ def main(args):
             download(data, download_location)
 
         if(args.split):
-            data.save_to_csv_split(args.data_file_name, )
+            data.save_to_csv_split(args.data_file_name, SPLIT_LENGTH)
         else:
             data.save_to_csv(args.data_file_name)
 
