@@ -48,11 +48,22 @@ class SampleData:
     
     # loads csv data into a numpy array
     def load_from_csv(self, file_name):
-        self.data_array = np.loadtxt(open(file_name, "rt"), delimiter=",")
+        with open(file_name,'r') as dest_f:
+            data_iter = csv.reader(dest_f,
+                                delimiter = ',',
+                                quotechar = '"')
+            data = [data for data in data_iter]
+        self.data_array = np.asarray(data)
 
     # combines from another SampleData object ignoring duplicates
     def combine(self, data):
-        self.data_array = np.unique(np.concatenate((self.data_array, data.data_array), 0))
+        self.data_array = np.unique(np.concatenate((self.data_array, data.data_array), axis=0), axis=0)
+
+    def remove_unsuccessful(self, unsuccessful):
+        self.data_array = np.delete(self.data_array, unsuccessful, axis=0)
+
+    def remove_duplicates(self):
+        self.data_array = np.unique(self.data_array, axis=0)
 
     # returns number of samples added
     def process_samples(self, results, query, samples_to_extract):
@@ -81,6 +92,18 @@ class SampleData:
 
     # save csv file containing file name and descriptors
     def save_to_csv(self, file_name):
-        file_name
-        print("saving data to file %s" % (file_name, ))
-        np.savetxt(file_name, self.data_array, delimiter=",",fmt="%s")
+        file_with_ext = file_name + '.csv'
+        print("saving data to file %s" % (file_with_ext, ))
+        np.savetxt(file_with_ext, self.data_array, delimiter=",",fmt="%s")
+
+    # save multiple csv files split up into separate files
+    def save_to_csv_split(self, file_name, split_num):
+        idx = 0
+        while (idx)*split_num < self.data_array.shape[0]:
+            indexed_file_name = f'%s-%i.csv' % (file_name, idx)
+            print('saving data to %s' % (indexed_file_name,))
+            i = idx*split_num
+            j = (idx + 1)*split_num
+            data_to_save = self.data_array[i:j]
+            np.savetxt(indexed_file_name, data_to_save, delimiter=",",fmt="%s")
+            idx = idx + 1

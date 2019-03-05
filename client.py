@@ -17,7 +17,7 @@ ACCESS_TOKEN = "/oauth2/access_token"
 # sample constants
 # TODO: put constants in separate file
 SAMPLES_PER_PAGE = 100
-MAX_DURATION = 6 # in seconds
+MAX_DURATION = 1 # in seconds
 
 class ApiClient:
     def __init__(self, client_key, secret_key):
@@ -104,7 +104,9 @@ class ApiClient:
         response = requests.get(url, headers=download_headers)
         if response.status_code != 200:
             print('error downloading file with sample id %s' % (sample_id, ))
-            return None
+            return False
         
         with open(target_directory + '/' + file_name, 'wb') as f:
             f.write(response.content)
+            return True
+

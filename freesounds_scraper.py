@@ -6,6 +6,10 @@ import argparse
 import csv
 import os
 import json
+
+# used to split of CSV files to run separately and avoid rate limit issues when downloading
+SPLIT_LENGTH = 1900
+
 # attempts to retrieve a number of samples given a specific query and store them into data array
 def retrieve_and_process(client, data, query, num_samples):
     print("running query '%s' for %i samples" % (query, num_samples))
@@ -75,7 +79,7 @@ def retrieve_samples(query):
     
     return data
 
-def download(data_to_download, download_location):
+def download(data, download_location):
     # load credentials JSON file
     with open('credentials.json') as f:
         data = json.load(f)
@@ -85,31 +89,44 @@ def download(data_to_download, download_location):
     # need oauth2 to download
     client = ApiClient(CLIENT_ID, SECRET_KEY)
     client.oauth2_authorize()
+    data_to_download = data.data_array
 
     print("downloading %d samples to %s" % (data_to_download.shape[0], download_location))
 
+    unsuccessful_downloads = []
+
     for row in tqdm(data_to_download):
-        client.download_sample(row[0], row[1], download_location)    
+        success = client.download_sample(row[0], row[1], download_location)
+        if not success:
+            unsuccessful_downloads.append(row)
+    
+    # delete unsuccessful downloads from data array
+    data.delete_unsuccessful(unsuccessful_downloads)
 
 
 def main(args):
     if(args.download_csv):
-        download_csv(args.download_csv)
+        download_location = args.target
+        if not os.path.isdir(download_location):
+            print("folder %s not found, creating" % (download_location, ))
+            os.mkdir(download_location)
+        download_csv(args.download_csv, download_location, args.data_file_name)
     else:
         data = SampleData()
         if(args.pack_query):
             data = retrieve_packs(args.pack_query)
         else:
             data = retrieve_samples(args.query)
-        
-        if(args.append_to_csv):
-            if not os.path.isfile(args.append_to_csv[0]):
-                print("could not load file %s" % (args.append_to_csv[0], ))
-            loaded_data = SampleData()
-            loaded_data.load_from_csv(args.append_to_csv[0])
-            data.combine(loaded_data)
 
-        data.save_to_csv(args.data_file_name)
+        data.remove_duplicates()
+
+        if(args.append_to_csv):
+            if not os.path.isfile(args.append_to_csv):
+                print("could not load file %s" % (args.append_to_csv, ))
+            else:
+                loaded_data = SampleData()
+                loaded_data.load_from_csv(args.append_to_csv)
+                data.combine(loaded_data)
 
         if(args.download):
             download_location = args.target
@@ -117,21 +134,31 @@ def main(args):
                 print("folder %s not found, creating" % (download_location, ))
                 os.mkdir(download_location)
 
-            download(data.data_array, download_location)
+            download(data, download_location)
 
-def download_csv(csv_to_download):
-    print("download csv")
+        if(args.split):
+            data.save_to_csv_split(args.data_file_name, )
+        else:
+            data.save_to_csv(args.data_file_name)
+
+def download_csv(csv_to_download, download_location, data_file_name):
+    data = SampleData()
+    data.load_from_csv(csv_to_download)
+    print(data.data_array)
+    # download(data, download_location)
+    # data.save_to_csv(data_file_name + '_downloaded')
     
 if __name__== "__main__":
     # setup argument parser
     parser = argparse.ArgumentParser(description='Welcome to the freesounds.org parser!')
-    parser.add_argument('--query', nargs=1, type=str, default='query.csv', help='location of csv containing queries')
-    parser.add_argument('--download', nargs=1, type=bool, default=False, help='whether or not to download')
-    parser.add_argument('--target', nargs=1, type=str, default='samples/', help='path to download samples to')
-    parser.add_argument('--data-file-name', nargs=1, type=str, default='data.csv', help='file name for CSV')
-    parser.add_argument('--download-csv', nargs=1, help='download a pre-processed csv')
-    parser.add_argument('--pack-query', nargs=1, type=str, help='retrieve packs listed in input file')
-    parser.add_argument('--append-to-csv', nargs=1, type=str, help='append to already existing csv')
+    parser.add_argument('--query', type=str, default='query.csv', help='location of csv containing queries')
+    parser.add_argument('--download', type=bool, default=False, help='whether or not to download')
+    parser.add_argument('--target', type=str, default='samples/', help='path to download samples to')
+    parser.add_argument('--data-file-name', type=str, default='data', help='file name for CSV')
+    parser.add_argument('--download-csv', type=str, help='download a pre-processed csv')
+    parser.add_argument('--pack-query',  type=str, help='retrieve packs listed in input file')
+    parser.add_argument('--append-to-csv', type=str, help='append to already existing csv')
+    parser.add_argument('--split', type=bool, default=False, help='whether to split into multiple csv files for rate limit issues')
     args = parser.parse_args()
 
     # call main function
