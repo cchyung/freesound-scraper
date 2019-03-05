@@ -67,6 +67,9 @@ class SampleData:
 
     # returns number of samples added
     def process_samples(self, results, query, samples_to_extract):
+        print(results)
+        if results is {}:
+            return 0
         for idx, sound_file in enumerate(results):
             sample_id = sound_file['id']
             file_name = str(sample_id) + '.wav'   # generate file name based off query

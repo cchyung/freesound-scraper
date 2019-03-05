@@ -17,13 +17,18 @@ def retrieve_and_process(client, data, query, num_samples):
 
     # can only retrieve at most number of samples available on website
     samples_to_retrieve = min(response['count'], num_samples)
+
+    if samples_to_retrieve == 0:
+            print("no samples found!")
+            return
+
     samples_to_retrieve -= data.process_samples(response['results'], query, samples_to_retrieve)
     
     page = 2
     while samples_to_retrieve > 0:
         response = client.query(query, page)
 
-        if response == {}:
+        if response == {} or response['count'] == 0:
             print("no more samples found!")
             break
         samples_to_retrieve -= data.process_samples(response['results'], query, samples_to_retrieve)
@@ -117,8 +122,9 @@ def main(args):
             data = retrieve_packs(args.pack_query)
         else:
             data = retrieve_samples(args.query)
-
-        data.remove_duplicates()
+        
+        if data.data_array.shape[0] > 0:
+            data.remove_duplicates()
 
         if(args.append_to_csv):
             if not os.path.isfile(args.append_to_csv):

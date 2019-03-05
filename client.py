@@ -16,7 +16,7 @@ ACCESS_TOKEN = "/oauth2/access_token"
 
 # sample constants
 # TODO: put constants in separate file
-SAMPLES_PER_PAGE = 100
+SAMPLES_PER_PAGE = 200
 MAX_DURATION = 1 # in seconds
 
 class ApiClient:
@@ -60,7 +60,7 @@ class ApiClient:
         self.oauth2_code = access_token
         return True
     
-    def filter_string(self, file_type='wav', max_duration=MAX_DURATION, min_downloads=1000, min_avg_rating=4):
+    def filter_string(self, file_type='wav', max_duration=MAX_DURATION, min_downloads=500, min_avg_rating=4):
         return f'type:{file_type} duration:[* TO {max_duration}]num_downloads:[{min_downloads} TO *]avg_rating:[{min_avg_rating} TO *]is_remix:false'
 
     # returns json from API for processing
