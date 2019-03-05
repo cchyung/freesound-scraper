@@ -17,7 +17,7 @@ ACCESS_TOKEN = "/oauth2/access_token"
 # sample constants
 # TODO: put constants in separate file
 SAMPLES_PER_PAGE = 200
-MAX_DURATION = 1 # in seconds
+MAX_DURATION = 3 # in seconds
 
 class ApiClient:
     def __init__(self, client_key, secret_key):
