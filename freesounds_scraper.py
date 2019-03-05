@@ -87,9 +87,9 @@ def retrieve_samples(query):
 def download(data, download_location):
     # load credentials JSON file
     with open('credentials.json') as f:
-        data = json.load(f)
-        CLIENT_ID = data['client_id']
-        SECRET_KEY = data['client_secret']
+        file_data = json.load(f)
+        CLIENT_ID = file_data['client_id']
+        SECRET_KEY = file_data['client_secret']
 
     # need oauth2 to download
     client = ApiClient(CLIENT_ID, SECRET_KEY)
@@ -106,7 +106,7 @@ def download(data, download_location):
             unsuccessful_downloads.append(row)
     
     # delete unsuccessful downloads from data array
-    data.delete_unsuccessful(unsuccessful_downloads)
+    data.remove_unsuccessful(unsuccessful_downloads)
 
 
 def main(args):
@@ -115,7 +115,7 @@ def main(args):
         if not os.path.isdir(download_location):
             print("folder %s not found, creating" % (download_location, ))
             os.mkdir(download_location)
-        download_csv(args.download_csv, download_location, args.data_file_name)
+        download_csv(args.download_csv, download_location)
     else:
         data = SampleData()
         if(args.pack_query):
@@ -147,7 +147,7 @@ def main(args):
         else:
             data.save_to_csv(args.data_file_name)
 
-def download_csv(csv_to_download, download_location, data_file_name):
+def download_csv(csv_to_download, download_location):
     data = SampleData()
     data.load_from_csv(csv_to_download)
     if not os.path.isdir(download_location):
