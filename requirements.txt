@@ -1,6 +1,6 @@
 requests==2.21.0
 tqdm==4.31.1
+numpy==1.13.3
 matplotlib==2.0.2
 pandas==0.24.1
 requests_oauthlib==1.2.0
-numpy==1.13.3
